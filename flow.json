@@ -1,0 +1,39 @@
+{
+	"contracts": {
+		"NonFungibleToken.cdc": {
+			"source": "./contracts/utility/NonFungibleToken.cdc",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "1d7e57aa55817448",
+				"testnet": "631e88ae7f1d7c20"
+			}
+		},
+		"Signatures": "./contracts/Signatures.cdc",
+		"ISignatures": "./contracts/ISignatures.cdc",
+		"YearBlocks": "./contracts/YearBlockscdc",
+		"SignatureAttachments": "./contracts/SignatureAttachment.cdc"
+	},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"sandboxnet": "access.sandboxnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"key": "0828b3c21fa5661d848adaa5e35e8ac6bd4db4f85869a924ade611fc669e1401"
+		}
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"NonFungibleToken",
+				"YearBlocks",
+				"ISignatures",
+				"Signatures",
+				"SignatureAttachments"
+			]
+		}
+	}
+}
