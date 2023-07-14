@@ -1,11 +1,11 @@
-import NonFungibleToken from "./utility/NonFungibleToken.cdc"
+import NonFungibleToken from "./utils/NonFungibleToken.cdc"
 
 pub contract YearBlocks: NonFungibleToken {
 
   //paths for storing and retrieving nft
   pub let CollectionStoragePath: StoragePath
   pub let CollectionPublicPath: PublicPath
-  pub let ProviderPrivatePath: PrivatePath
+  pub let CollectionPrivatePath: PrivatePath
 
   //total YearBlocks of this type
   pub var totalSupply: UInt64
@@ -41,7 +41,7 @@ pub contract YearBlocks: NonFungibleToken {
         result == nil || result!.id == id: "The returned reference's ID does not match the requested ID"
       }
     }
-    pub fun borrowYearBlockNFT(id: UInt64): &NFT? {
+    pub fun borrowYearBlockNFT(id: UInt64): &YearBlock? {
       post {
         (result == nil) || (result?.id == id):
           "Cannot borrow NFT reference: the ID of the returned reference is incorrect"
@@ -72,17 +72,17 @@ pub contract YearBlocks: NonFungibleToken {
       return &self.ownedNFTs[id] as! &NonFungibleToken.NFT?
     }
 
-    pub fun borrowYearBlockNFT(id: UInt64): &NFT? {
+    pub fun borrowYearBlockNFT(id: UInt64): &YearBlock? {
       if self.ownedNFTs[id] != nil {
         // Create an authorized reference to allow downcasting
         let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
-        return ref as! &NFT
+        return ref as! &YearBlock
       }
       return nil
     }
 
     pub fun deposit(token: @NonFungibleToken.NFT) {
-      let token <- token as! @NFT
+      let token <- token as! @YearBlock
 
       let id: UInt64 = token.id
 
@@ -112,11 +112,11 @@ pub contract YearBlocks: NonFungibleToken {
   }
 
 
-  access(all) fun mintNFT(id: id, link: link, allowList: allowList, name: name): @NFT {
+  access(all) fun mintNFT(id: UInt64, link: String, allowList: [String], name: String): @YearBlock {
     // Increment total supply
     self.totalSupply = self.totalSupply + 1
     // Create the NFT
-    let nft <-create NFT(id: id, link: link, allowList: allowList, name: name)
+    let nft <-create YearBlock(id: id, link: link, allowList: allowList, name: name)
     // Emit an event & return the created NFT
     emit YearBlockMinted(id: nft.id, name: name)
     return <- nft
@@ -130,7 +130,7 @@ pub contract YearBlocks: NonFungibleToken {
     self.CollectionPrivatePath = /private/YearBlocksCollectionPublic
 
     let collection <-create Collection()
-    collection.deposit(token: <-create NFT(id: 1, link: "https://drive.google.com/file/d/1ahYRs7qeKMRgZwXMokaGYR6oOtd4Swdk/view?usp=sharing", allowList: ["student.001@steadystudios.org", "student.002@steadystudios.org", "student.003@steadystudios.org", "student.004@steadystudios.org", "student.005@steadystudios.org", "student.006@steadystudios.org", "student.007@steadystudios.org", "student.008@steadystudios.org" ], name: "Genesis YearBlock"))
+    collection.deposit(token: <-create YearBlock(id: 1, link: "https://drive.google.com/file/d/1ahYRs7qeKMRgZwXMokaGYR6oOtd4Swdk/view?usp=sharing", allowList: ["student.001@steadystudios.org", "student.002@steadystudios.org", "student.003@steadystudios.org", "student.004@steadystudios.org", "student.005@steadystudios.org", "student.006@steadystudios.org", "student.007@steadystudios.org", "student.008@steadystudios.org" ], name: "Genesis YearBlock"))
     self.account.save(<-collection, to: self.CollectionStoragePath)
     self.account.link<&Collection{NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic}>(self.CollectionPublicPath, target: self.CollectionStoragePath)
     self.account.link<&Collection{NonFungibleToken.Receiver, NonFungibleToken.Provider, NonFungibleToken.CollectionPublic, CollectionPublic}>(self.CollectionPrivatePath, target: self.CollectionStoragePath)

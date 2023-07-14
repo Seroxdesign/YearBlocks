@@ -1,7 +1,26 @@
 {
 	"contracts": {
-		"NonFungibleToken.cdc": {
-			"source": "./contracts/utility/NonFungibleToken.cdc",
+		"NonFungibleToken": {
+			"source": "./contracts/utils/NonFungibleToken.cdc",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "1d7e57aa55817448",
+				"testnet": "631e88ae7f1d7c20"
+			}
+		},
+		"FungibleToken": {
+			"source": "./contracts/utils/FungibleToken.cdc"
+		},
+		"MetadataViews": {
+			"source": "./contracts/utils/MetadataViews.cdc",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "1d7e57aa55817448",
+				"testnet": "631e88ae7f1d7c20"
+			}
+		},
+		"ViewResolver": {
+			"source": "./contracts/utils/ViewResolver.cdc",
 			"aliases": {
 				"emulator": "f8d6e0586b0a20c7",
 				"mainnet": "1d7e57aa55817448",
@@ -9,9 +28,7 @@
 			}
 		},
 		"Signatures": "./contracts/Signatures.cdc",
-		"ISignatures": "./contracts/ISignatures.cdc",
-		"YearBlocks": "./contracts/YearBlockscdc",
-		"SignatureAttachments": "./contracts/SignatureAttachment.cdc"
+		"YearBlocks": "./contracts/YearBlocks.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -23,16 +40,21 @@
 		"emulator-account": {
 			"address": "f8d6e0586b0a20c7",
 			"key": "0828b3c21fa5661d848adaa5e35e8ac6bd4db4f85869a924ade611fc669e1401"
+		},
+		"testnet-account": {
+			"address": "0xe11c4af224808fca",
+			"key": "8f5b097d414f41c7810723b2046b3b760875f6dea087cdef67150e67dc4cc0f7"
 		}
 	},
 	"deployments": {
-		"emulator": {
-			"emulator-account": [
+		"testnet": {
+			"testnet-account": [
 				"NonFungibleToken",
+				"MetadataViews",
+				"FungibleToken",
+				"ViewResolver",
 				"YearBlocks",
-				"ISignatures",
-				"Signatures",
-				"SignatureAttachments"
+				"Signatures"
 			]
 		}
 	}
