@@ -1,16 +1,16 @@
-import "YearBlocks"
+import "Signatures"
 import "NonFungibleToken"
 
 /// This transaction mints a new YearBlocks NFT and saves it in the signer's Collection
 ///
-transaction (comment: String, image: String, name: String)  {
+transaction (id: UInt64, comment: String, image: String, name: String)  {
 
-    let collectionRef: &{YearBlocks.CollectionPublic}
+    let collectionRef: &{Signatures.CollectionPublic}
 
     prepare(signer: AuthAccount) {
         // Get a reference to the signer's YearBlocks Collection
-        self.collectionRef = signer.getCapability<&{YearBlocks.CollectionPublic}>(
-               YearBlocks.CollectionPublicPath
+        self.collectionRef = signer.getCapability<&{Signatures.CollectionPublic}>(
+               Signatures.CollectionPublicPath
             ).borrow()
             ?? panic("Signer does not have a CollectionPublic Capability configured")
     }
@@ -18,7 +18,7 @@ transaction (comment: String, image: String, name: String)  {
     execute {
         // Deposit a newly minted NFT
         self.collectionRef.deposit(
-            token: <-YearBlocks.mintNFT(comment: comment, image: image, name: name)
+            token: <-Signatures.mintNFT(id: id, comment: comment, image: image, name: name)
         )
     }
 }

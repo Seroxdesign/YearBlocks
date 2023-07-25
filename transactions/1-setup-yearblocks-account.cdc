@@ -20,10 +20,10 @@ transaction {
     )
 
     // Prepare to link PrivatePath
-    signer.unlink(YearBlocks.ProviderPrivatePath)
+    signer.unlink(YearBlocks.CollectionPrivatePath)
     // Link private Capabilities
     signer.link<&{NonFungibleToken.Receiver}>(
-      YearBlocks.ProviderPrivatePath,
+      YearBlocks.CollectionPrivatePath,
       target: YearBlocks.CollectionStoragePath
     )
   }

@@ -18,16 +18,26 @@ pub contract Signatures : NonFungibleToken {
     access(all) event Withdraw(id: UInt64, from: Address?)
     access(all) event Deposit(id: UInt64, to: Address?)
 
-    pub resource Signature {
+    pub resource interface ExtendedINFT {
+        pub let id: UInt64 // From NonFungibleToken.INFT
+        pub var digiComment: String
+        pub var digiSig: String
+        pub var digiName: String
+    }
+
+
+    pub resource NFT: NonFungibleToken.INFT, ExtendedINFT {
+        pub let id: UInt64
         pub var digiComment: String
         pub var digiSig: String
         pub var digiName: String
 
         // Initialize the signature with a comment and an image
-        init(comment: String, image: String, name: String) {
-            self.digiName = name
+        init(id: UInt64, comment: String, image: String, name: String) {
+            self.id = id
             self.digiComment = comment
             self.digiSig = image
+            self.digiName = name
         }
 
         access(all) fun getSignatureName(): String {
@@ -63,7 +73,7 @@ pub contract Signatures : NonFungibleToken {
             self.signatureNFT <-! new
         }
 
-        /// Removes the contained KittyHats.NFT if contained or nil otherwise
+        /// Removes the contained nft if contained or nil otherwise
         ///
         access(contract) fun removeSignatureNFT(): @NFT? {
             // Cannot move nested resources, so we:
@@ -74,8 +84,9 @@ pub contract Signatures : NonFungibleToken {
             return <- tmp
         }
 
-        destroy() {
-            destroy self.signatureNFT
+       destroy() {
+
+            destroy <- self.signatureNFT
         }
     }
 
@@ -83,10 +94,10 @@ pub contract Signatures : NonFungibleToken {
         access(all) fun deposit(token: @NonFungibleToken.NFT)
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) fun borrowNFTSafe(id: UInt64): &NonFungibleToken.NFT?
-        access(all) fun borrowYearBlocksSignatureNFT(id: UInt64): &KittyHats.NFT?
+        access(all) fun borrowYearBlocksSignatureNFT(id: UInt64): &YearBlocks.NFT?
     }
 
-    /// Allows for storage of any KittyHats NFTs
+    /// Allows for storage of any NFTs
     ///
     access(all) resource Collection : NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic {
         /// Dictionary to hold the NFTs in the Collection
@@ -120,7 +131,7 @@ pub contract Signatures : NonFungibleToken {
         /// Returns a reference to the YearBlocks.NFT with given ID or nil if not found
         ///
         access(all) fun borrowYearBlocksSignatureNFT(id: UInt64): &YearBlocks.NFT? {
-            // **Optional Binding** - Assign if the value is not nil for given ID
+    // your implementation
             if self.ownedNFTs[id] != nil {
                 // Create an authorized reference to allow downcasting
                 let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
@@ -129,11 +140,11 @@ pub contract Signatures : NonFungibleToken {
             // Otherwise return nil
             return nil
         }
-        
+
         /// Adds the given NFT to the Collection
         ///
         access(all) fun deposit(token: @NonFungibleToken.NFT) {
-            let token <- token as! @YearBlocks.NFT
+            let token <- token as! @Signatures.NFT
 
             let id: UInt64 = token.id
 
@@ -170,17 +181,17 @@ pub contract Signatures : NonFungibleToken {
             withAttachment[SignatureAttachment]!.addSignatureNFT(<-signature)
 
             let sigRef: &NFT = withAttachment[SignatureAttachment]!.borrowSignature()!
-            emit SignatureAddedToYearBlock(name: sigRef.getSignatureName, comment: sigRef.getSignatureComment, signature: sigRef.getSignature)
+            emit SignatureAddedToYearBlock(name: sigRef.getSignatureName(), comment: sigRef.getSignatureComment(), signature: sigRef.getSignature())
             
             return <- withAttachment
         }
 
         access(all) fun removeSignatureFromYearBlock(fromYearBlocks: @YearBlocks.NFT): @YearBlocks.NFT {
      
-            if let attached: &HatAttachment = fromYearBlocks[SignatureAttachment] {
+            if let attached: &SignatureAttachment = fromYearBlocks[SignatureAttachment] {
              
                 if let removedSignature: @NFT <- attached.removeSignatureNFT() {
-                    emit removeSignatureFromYearBlock(name: removedSignature.getSignatureName, comment: removedSignature.getSignatureComment, signature: removedSignature.getSignature)
+                    emit removeSignatureFromYearBlock(name: removedSignature.getSignatureName(), comment: removedSignature.getSignatureComment(), signature: removedSignature.getSignature())
                     
                     // Then deposit it back to this Collection
                     self.deposit(token: <- removedSignature)
@@ -205,14 +216,18 @@ pub contract Signatures : NonFungibleToken {
         }
     }
    ///
-    access(all) fun createEmptyCollection(): @Collection {
-        return <- create Collection()
+
+    pub fun createEmptyCollection(): @Collection {
+        post {
+            result.getIDs().length == 0: "The created collection must be empty!"
+        }
+        return <-create Collection()
     }
 
     // Function to create a new Signature
-    access(all) fun mintNFT(comment: String, image: String, name: String): @NFT {
+    access(all) fun mintNFT(id: UInt64, comment: String, image: String, name: String): @NFT {
         // Create an NFT
-        let nft <- create NFT(comment: comment, image: image, name: name)
+        let nft <- create NFT(id: id, comment: comment, image: image, name: name)
         // Emit the relevant event with the new NFT's info & return
         emit SignatureMinted(id: nft.id, name: name)
         return <- nft
