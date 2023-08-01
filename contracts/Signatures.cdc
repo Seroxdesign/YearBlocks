@@ -91,10 +91,12 @@ pub contract Signatures : NonFungibleToken {
     }
 
     access(all) resource interface CollectionPublic {
+       pub fun getIDs(): [UInt64]
         access(all) fun deposit(token: @NonFungibleToken.NFT)
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) fun borrowNFTSafe(id: UInt64): &NonFungibleToken.NFT?
         access(all) fun borrowYearBlocksSignatureNFT(id: UInt64): &YearBlocks.NFT?
+        access(all) fun borrowSignatureNFT(id: UInt64): &Signatures.NFT?
     }
 
     /// Allows for storage of any NFTs
@@ -131,7 +133,7 @@ pub contract Signatures : NonFungibleToken {
         /// Returns a reference to the YearBlocks.NFT with given ID or nil if not found
         ///
         access(all) fun borrowYearBlocksSignatureNFT(id: UInt64): &YearBlocks.NFT? {
-    // your implementation
+        // your implementation
             if self.ownedNFTs[id] != nil {
                 // Create an authorized reference to allow downcasting
                 let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
@@ -141,6 +143,14 @@ pub contract Signatures : NonFungibleToken {
             return nil
         }
 
+        access(all) fun borrowSignatureNFT(id: UInt64): &Signatures.NFT? {
+            if self.ownedNFTs[id] != nil {
+                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
+                return ref as! &Signatures.NFT
+            }
+
+            return nil
+        }
         /// Adds the given NFT to the Collection
         ///
         access(all) fun deposit(token: @NonFungibleToken.NFT) {

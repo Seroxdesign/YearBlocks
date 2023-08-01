@@ -5,7 +5,7 @@ import "YearBlocks"
 ///
 pub fun main(address: Address): [UInt64] {
     // Get a reference to the CollectionPublic Capability from the specified Address
-    let collectionPublicRef = getAccount(address).getCapability<&{NonFungibleToken.CollectionPublic}>(
+    let collectionPublicRef = getAccount(address).getCapability<&{YearBlocks.CollectionPublic}>(
       YearBlocks.CollectionPublicPath 
     ).borrow()
     ?? panic("Couldn't find CollectionPublic Capability at given Address!")

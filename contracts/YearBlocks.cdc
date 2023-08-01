@@ -58,6 +58,22 @@ pub contract YearBlocks: NonFungibleToken {
             self.allowList = allowList
             self.name = name
         }
+
+        access(all) fun getName(): String {
+            return self.name
+        }
+
+        access(all) fun getId(): UInt64 {
+            return self.id
+        }
+        
+        access(all) fun getAllowList(): [String] {
+            return self.allowList
+        } 
+
+        access(all) fun getLink(): String {
+            return self.link
+        }
     }
 
     pub resource Collection: NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, CollectionPublic {
@@ -97,6 +113,16 @@ pub contract YearBlocks: NonFungibleToken {
                 self.ownedNFTs.containsKey(id): "No NFT with given id in Collection!"
             }
             return (&self.ownedNFTs[id] as! &NonFungibleToken.NFT?)!
+        }
+
+        pub fun borrowYearBlockNFT(id: UInt64): &YearBlocks.NFT? {
+            // **Optional Binding** - Assign if the value is not nil for given ID
+            if let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT? {
+                // Create an authorized reference to allow downcasting
+                return ref as! &YearBlocks.NFT
+            }
+            // Otherwise return nil
+            return nil
         }
 
         pub fun borrowNFTSafe(id: UInt64): &NonFungibleToken.NFT? {

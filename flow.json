@@ -38,12 +38,12 @@
 	},
 	"accounts": {
 		"emulator-account": {
-			"address": "0xac027cb12de976a2",
-			"key": "7b0324d5a76b548966b2e02fe24493c110547afb76f50ebf17f4d00f8d947b7b"
+			"address": "0x770b3ddf7db51dd1",
+			"key": "da90b83efdd8eeaa6334429a54d6d7a84a5ff7abc2311a2ba4b6bae048c77bfc"
 		},
 		"testnet-account": {
-			"address": "0xac027cb12de976a2",
-			"key": "7b0324d5a76b548966b2e02fe24493c110547afb76f50ebf17f4d00f8d947b7b"
+			"address": "0x770b3ddf7db51dd1",
+			"key": "da90b83efdd8eeaa6334429a54d6d7a84a5ff7abc2311a2ba4b6bae048c77bfc"
 		}
 	},
 	"deployments": {
