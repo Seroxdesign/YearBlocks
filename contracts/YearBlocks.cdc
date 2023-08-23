@@ -39,11 +39,13 @@ pub contract YearBlocks: NonFungibleToken {
     }
   }
 
- pub resource interface ExtendedINFT {
+    pub resource interface ExtendedINFT {
         pub let id: UInt64 // From NonFungibleToken.INFT
         pub var link: String // New
+        pub var thumbnail: String
         pub var allowList: [String] // New
         pub let name: String // New
+        pub let description: String
     }
 
     pub resource NFT: NonFungibleToken.INFT, ExtendedINFT {
@@ -51,16 +53,28 @@ pub contract YearBlocks: NonFungibleToken {
         pub var link: String
         pub var allowList: [String]
         pub let name: String
+        pub var thumbnail: String
+        pub let description: String
 
-        init(id: UInt64, link: String, allowList: [String], name: String) {
+        init(id: UInt64, link: String, allowList: [String], name: String, thumbnail: String, description: String) {
             self.id = id
             self.link = link
             self.allowList = allowList
             self.name = name
+            self.thumbnail = thumbnail
+            self.description = description
         }
 
         access(all) fun getName(): String {
             return self.name
+        }
+
+        access(all) fun getThumbnail(): String {
+            return self.thumbnail
+        }
+
+        access(all) fun getDescription(): String {
+            return self.description
         }
 
         access(all) fun getId(): UInt64 {
@@ -141,18 +155,18 @@ pub contract YearBlocks: NonFungibleToken {
         return <-create Collection()
     }
 
-    access(all) fun mintNFT(id: UInt64, link: String, allowList: [String], name: String): @NFT {
+    access(all) fun mintNFT(id: UInt64, link: String, allowList: [String], name: String, thumbnail: String, description: String): @NFT {
         self.totalSupply = self.totalSupply + 1
-        let nft <- create NFT(id: id, link: link, allowList: allowList, name: name)
+        let nft <- create NFT(id: id, link: link, allowList: allowList, name: name, thumbnail: thumbnail, description: description)
         emit YearBlockMinted(id: nft.id, name: name)
         return <-nft
     }
 
     init() {
         self.totalSupply = 0
-         self.CollectionStoragePath = /storage/YearBlocksCollection
-    self.CollectionPublicPath = /public/YearBlocksCollectionPublic
-    self.CollectionPrivatePath = /private/YearBlocksCollectionPublic
+        self.CollectionStoragePath = /storage/YearBlocksCollection
+        self.CollectionPublicPath = /public/YearBlocksCollectionPublic
+        self.CollectionPrivatePath = /private/YearBlocksCollectionPublic
         emit ContractInitialized()
     }
 }

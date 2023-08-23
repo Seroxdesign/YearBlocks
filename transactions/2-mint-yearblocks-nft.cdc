@@ -3,7 +3,7 @@ import "NonFungibleToken"
 
 /// This transaction mints a new YearBlocks NFT and saves it in the signer's Collection
 ///
-transaction (id: UInt64, link: String, allowList: [String], name: String) {
+transaction (id: UInt64, link: String, allowList: [String], name: String, thumbnail: String, description: String) {
 
   let collectionRef: &{YearBlocks.CollectionPublic}
 
@@ -18,7 +18,7 @@ transaction (id: UInt64, link: String, allowList: [String], name: String) {
   execute {
     // Deposit a newly minted NFT
     self.collectionRef.deposit(
-      token: <-YearBlocks.mintNFT(id: id, link: link, allowList: allowList, name: name)
+      token: <-YearBlocks.mintNFT(id: id, link: link, allowList: allowList, name: name, thumbnail: thumbnail, description: description)
     )
   }
 }

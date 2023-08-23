@@ -25,7 +25,6 @@ pub contract Signatures : NonFungibleToken {
         pub var digiName: String
     }
 
-
     pub resource NFT: NonFungibleToken.INFT, ExtendedINFT {
         pub let id: UInt64
         pub var digiComment: String
@@ -55,43 +54,38 @@ pub contract Signatures : NonFungibleToken {
     }
 
     access(all) attachment SignatureAttachment for YearBlocks.NFT {
-        access(self) var signatureNFT: @NFT?
-        
+        access(self) var signatureNFTs: @{UInt64: NFT}
+
         init() {
-            self.signatureNFT <- nil
+            self.signatureNFTs <- {}
         }
 
-        access(all) fun borrowSignature(): &NFT? {
-            return &self.signatureNFT as &NFT?
+        access(all) fun getIDsFromAttachment(): [UInt64] {
+            return self.signatureNFTs.keys
         }
 
+        access(all) fun borrowSignature(id: UInt64): &NFT? {
+            return &self.signatureNFTs[id] as &NFT?
+        }
 
-        access(all) fun addSignatureNFT(_ new: @NFT) {
+        access(all) fun addSignatureNFT(_ new: @NFT, id: UInt64) {
             pre {
-                self.signatureNFT == nil: "Cannot add NFT while assigned - must remove first!"
+                !self.signatureNFTs.containsKey(id): "Cannot add NFT with duplicate ID!"
             }
-            self.signatureNFT <-! new
+            self.signatureNFTs[id] <-! new
         }
 
-        /// Removes the contained nft if contained or nil otherwise
-        ///
-        access(contract) fun removeSignatureNFT(): @NFT? {
-            // Cannot move nested resources, so we:
-            // Assign a temporary optional resource as nil and swap
-            var tmp: @NFT? <- nil
-            // Swap nested and temporary resources
-            tmp <-> self.signatureNFT
-            return <- tmp
+        access(contract) fun removeSignatureNFT(id: UInt64): @NFT? {
+            return <- self.signatureNFTs.remove(key: id)
         }
 
-       destroy() {
-
-            destroy <- self.signatureNFT
+        destroy() {
+            destroy self.signatureNFTs
         }
     }
 
     access(all) resource interface CollectionPublic {
-       pub fun getIDs(): [UInt64]
+        access(all) fun getIDs(): [UInt64]
         access(all) fun deposit(token: @NonFungibleToken.NFT)
         access(all) fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
         access(all) fun borrowNFTSafe(id: UInt64): &NonFungibleToken.NFT?
@@ -182,28 +176,19 @@ pub contract Signatures : NonFungibleToken {
             pre {
                 self.ownedNFTs.containsKey(signatureId): "No signature NFT with given ID in this Collection!"
             }
-            // Make sure an attachment is added if need be
-            let withAttachment: @YearBlocks.NFT <-self.addAttachment(toNFT: <-toYearBlocks)
-
-        
-            let signature  <- self.withdraw(withdrawID: signatureId) as! @NFT
-
-            withAttachment[SignatureAttachment]!.addSignatureNFT(<-signature)
-
-            let sigRef: &NFT = withAttachment[SignatureAttachment]!.borrowSignature()!
+            let withAttachment: @YearBlocks.NFT <- self.addAttachment(toNFT: <-toYearBlocks)
+            let signature <- self.withdraw(withdrawID: signatureId) as! @NFT
+            withAttachment[SignatureAttachment]!.addSignatureNFT(<-signature, id: signatureId)
+            let sigRef: &NFT = withAttachment[SignatureAttachment]!.borrowSignature(id: signatureId)!
             emit SignatureAddedToYearBlock(name: sigRef.getSignatureName(), comment: sigRef.getSignatureComment(), signature: sigRef.getSignature())
             
             return <- withAttachment
         }
 
-        access(all) fun removeSignatureFromYearBlock(fromYearBlocks: @YearBlocks.NFT): @YearBlocks.NFT {
-     
+        access(all) fun removeSignatureFromYearBlock(signatureId: UInt64, fromYearBlocks: @YearBlocks.NFT): @YearBlocks.NFT {
             if let attached: &SignatureAttachment = fromYearBlocks[SignatureAttachment] {
-             
-                if let removedSignature: @NFT <- attached.removeSignatureNFT() {
+                if let removedSignature: @NFT <- attached.removeSignatureNFT(id: signatureId) {
                     emit removeSignatureFromYearBlock(name: removedSignature.getSignatureName(), comment: removedSignature.getSignatureComment(), signature: removedSignature.getSignature())
-                    
-                    // Then deposit it back to this Collection
                     self.deposit(token: <- removedSignature)
                 }
             }

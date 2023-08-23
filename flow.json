@@ -1,5 +1,17 @@
 {
 	"contracts": {
+		"AccountCreator": "./contracts/utils/AccountCreator.cdc",
+		"FlowToken": {
+			"source": "./contracts/utils/FlowToken.cdc",
+			"aliases": {
+				"emulator": "0x0ae53cb6e3f42a79",
+				"testnet": "0x7e60df042a9c0868"
+			}
+		},
+		"CapabilityDelegator": "./contracts/hybridCustody/CapabilityDelegator.cdc",
+		"CapabilityFactory": "./contracts/hybridCustody/CapabilityFactory.cdc",
+		"CapabilityFilter": "./contracts/hybridCustody/CapabilityFilter.cdc",
+		"HybridCustody": "./contracts/hybridCustody/HybridCustody.cdc",
 		"NonFungibleToken": {
 			"source": "./contracts/utils/NonFungibleToken.cdc",
 			"aliases": {
@@ -38,17 +50,22 @@
 	},
 	"accounts": {
 		"emulator-account": {
-			"address": "0x770b3ddf7db51dd1",
-			"key": "da90b83efdd8eeaa6334429a54d6d7a84a5ff7abc2311a2ba4b6bae048c77bfc"
+			"address": "0x24a3cbe995e718ff",
+			"key": "f40fa7014b5558fef63fcd66be41b66f30ad54992b06d75b384c3669f8620a67"
 		},
 		"testnet-account": {
-			"address": "0x770b3ddf7db51dd1",
-			"key": "da90b83efdd8eeaa6334429a54d6d7a84a5ff7abc2311a2ba4b6bae048c77bfc"
+			"address": "0x24a3cbe995e718ff",
+			"key": "f40fa7014b5558fef63fcd66be41b66f30ad54992b06d75b384c3669f8620a67"
 		}
 	},
 	"deployments": {
 		"testnet": {
 			"testnet-account": [
+				"AccountCreator",
+				"CapabilityDelegator",
+				"CapabilityFactory",
+				"CapabilityFilter",
+				"HybridCustody",
 				"NonFungibleToken",
 				"MetadataViews",
 				"FungibleToken",
