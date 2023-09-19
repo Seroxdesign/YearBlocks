@@ -26,7 +26,7 @@ transaction(signatureID: UInt64, yearblockID: UInt64) {
         let YearBlocksNFT: @YearBlocks.NFT <- self.yearblocksCollectionRef.withdraw(withdrawID: yearblockID) as! @YearBlocks.NFT
 
         // Put the signature on the yearblock
-        let yearblockWithSignature: @NonFungibleToken.NFT <- self.signaturesCollectionRef.attachSignatureToYearBlock(signatureId: signatureID, toYearBlocks: <- YearBlocksNFT)
+        let yearblockWithSignature: @YearBlocks.NFT <- self.signaturesCollectionRef.attachSignatureToYearBlock(signatureId: signatureID, toYearBlocks: <- YearBlocksNFT)
 
         // Deposit the yearblock into it's storage ref
         self.yearblocksCollectionRef.deposit(token: <- yearblockWithSignature)

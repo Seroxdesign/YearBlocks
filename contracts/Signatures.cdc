@@ -220,15 +220,17 @@ pub contract Signatures : NonFungibleToken {
     }
 
     // Function to create a new Signature
-    access(all) fun mintNFT(id: UInt64, comment: String, image: String, name: String): @NFT {
+    access(all) fun mintNFT(comment: String, image: String, name: String): @NFT {
+        let signatureID = self.totalSupply + 1
+        self.totalSupply = signatureID
         // Create an NFT
-        let nft <- create NFT(id: id, comment: comment, image: image, name: name)
+        let nft <- create NFT(id: signatureID, comment: comment, image: image, name: name)
         // Emit the relevant event with the new NFT's info & return
         emit SignatureMinted(id: nft.id, name: name)
         return <- nft
     }
 
-      init() {
+    init() {
         // Assign initial supply of 0
         self.totalSupply = 0
         

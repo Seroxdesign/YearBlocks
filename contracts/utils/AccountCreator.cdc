@@ -1,4 +1,4 @@
-import "FungibleToken"
+import FungibleToken from 0x9a0766d93b6608b7
 import FlowToken from 0x7e60df042a9c0868
 
 /// This contract defines a resource enabling easy account creation and querying of created addresses by their
@@ -23,7 +23,6 @@ pub contract AccountCreator {
     pub resource interface CreatorPublic {
         pub fun getAddressFromPublicKey(publicKey: String): Address?
         pub fun getAllCreatedAddresses(): [Address]
-        pub fun createNewAccount(signer: AuthAccount, initialFundingAmount: UFix64, originatingPublicKey: String): AuthAccount
     }
 
     /// Anyone holding this resource can create new accounts, keeping a mapping of each account's originating public 
@@ -86,13 +85,13 @@ pub contract AccountCreator {
             )
 
             // Add some initial funds to the new account, pulled from the signing account.  Amount determined by initialFundingAmount
-            // newAccount.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
-            //     .borrow()!
-            //     .deposit(
-            //         from: <- signer.borrow<&{FungibleToken.Provider}>(
-            //             from: /storage/flowTokenVault
-            //         )!.withdraw(amount: initialFundingAmount)
-            //     )
+            newAccount.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)
+                .borrow()!
+                .deposit(
+                    from: <- signer.borrow<&{FungibleToken.Provider}>(
+                        from: /storage/flowTokenVault
+                    )!.withdraw(amount: initialFundingAmount)
+                )
 
             self.createdAccounts.insert(key:originatingPublicKey, newAccount.address)
             emit AccountCreated(creatorAddress: self.owner?.address, creatorUUID: self.uuid, newAccount: newAccount.address, originatingPublicKey: originatingPublicKey)

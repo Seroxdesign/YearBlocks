@@ -186,7 +186,7 @@ pub contract FlowToken: FungibleToken {
         // Create a public capability to the stored Vault that only exposes
         // the `balance` field through the `Balance` interface
         //
-        adminAccount.link<&FlowToken.Vault{FungibleToken.Balance}>(
+        adminAccount.link<&FlowToken.Vault>(
             /public/flowTokenBalance,
             target: /storage/flowTokenVault
         )

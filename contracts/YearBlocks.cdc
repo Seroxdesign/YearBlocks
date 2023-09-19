@@ -46,6 +46,9 @@ pub contract YearBlocks: NonFungibleToken {
         pub var allowList: [String] // New
         pub let name: String // New
         pub let description: String
+        pub var districtName: String
+        pub var schoolName: String
+        pub var schoolYear: String
     }
 
     pub resource NFT: NonFungibleToken.INFT, ExtendedINFT {
@@ -55,14 +58,32 @@ pub contract YearBlocks: NonFungibleToken {
         pub let name: String
         pub var thumbnail: String
         pub let description: String
+        pub var districtName: String
+        pub var schoolName: String
+        pub var schoolYear: String
 
-        init(id: UInt64, link: String, allowList: [String], name: String, thumbnail: String, description: String) {
+        init(id: UInt64, link: String, allowList: [String], name: String, thumbnail: String, description: String, districtName: String, schoolName: String, schoolYear: String) {
             self.id = id
             self.link = link
             self.allowList = allowList
             self.name = name
             self.thumbnail = thumbnail
             self.description = description
+            self.districtName = districtName
+            self.schoolName = schoolName
+            self.schoolYear = schoolYear
+        }
+
+        access(all) fun getDistrictName(): String {
+            return self.districtName
+        }
+
+        access(all) fun getSchoolName(): String {
+            return self.schoolName
+        }
+
+        access(all) fun getSchoolYear(): String {
+            return self.schoolYear
         }
 
         access(all) fun getName(): String {
@@ -155,9 +176,10 @@ pub contract YearBlocks: NonFungibleToken {
         return <-create Collection()
     }
 
-    access(all) fun mintNFT(id: UInt64, link: String, allowList: [String], name: String, thumbnail: String, description: String): @NFT {
-        self.totalSupply = self.totalSupply + 1
-        let nft <- create NFT(id: id, link: link, allowList: allowList, name: name, thumbnail: thumbnail, description: description)
+    access(all) fun mintNFT(link: String, allowList: [String], name: String, thumbnail: String, description: String, districtName: String, schoolName: String, schoolYear: String): @NFT {
+        let yearblockID = self.totalSupply + 1
+        self.totalSupply = yearblockID
+        let nft <- create NFT(id: yearblockID, link: link, allowList: allowList, name: name, thumbnail: thumbnail, description: description, districtName: districtName, schoolName: schoolName, schoolYear: schoolYear)
         emit YearBlockMinted(id: nft.id, name: name)
         return <-nft
     }
